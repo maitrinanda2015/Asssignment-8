@@ -1,0 +1,471 @@
+<aside>
+💡 **1**
+
+Given two strings s1 and s2, return *the lowest **ASCII** sum of deleted characters to make two strings equal*.
+
+**Example 1:**
+
+**Input:** s1 = "sea", s2 = "eat"
+
+**Output:** 231
+
+**Explanation:** Deleting "s" from "sea" adds the ASCII value of "s" (115) to the sum.
+
+Deleting "t" from "eat" adds 116 to the sum.
+
+At the end, both strings are equal, and 115 + 116 = 231 is the minimum sum possible to achieve this.
+
+ans-:
+public class MinimumDeleteSum {
+    public static int minimumDeleteSum(String s1, String s2) {
+        int m = s1.length();
+        int n = s2.length();
+        
+        int[][] dp = new int[m + 1][n + 1];
+        
+        // Calculate the ASCII sum for deleting characters in s1
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] = dp[i - 1][0] + s1.charAt(i - 1);
+        }
+        
+        // Calculate the ASCII sum for deleting characters in s2
+        for (int j = 1; j <= n; j++) {
+            dp[0][j] = dp[0][j - 1] + s2.charAt(j - 1);
+        }
+        
+        // Calculate the minimum ASCII sum for making two strings equal
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.min(dp[i - 1][j] + s1.charAt(i - 1), dp[i][j - 1] + s2.charAt(j - 1));
+                }
+            }
+        }
+        
+        return dp[m][n];
+    }
+    
+    public static void main(String[] args) {
+        String s1 = "sea";
+        String s2 = "eat";
+        System.out.println(minimumDeleteSum(s1, s2)); // Output: 231
+    }
+}
+<aside>
+💡 **2**
+
+Given a string s containing only three types of characters: '(', ')' and '*', return true *if* s *is **valid***.
+
+The following rules define a **valid** string:
+
+- Any left parenthesis '(' must have a corresponding right parenthesis ')'.
+- Any right parenthesis ')' must have a corresponding left parenthesis '('.
+- Left parenthesis '(' must go before the corresponding right parenthesis ')'.
+- '*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string "".
+
+**Example 1:**
+
+**Input:** s = "()"
+
+**Output:**
+
+true
+
+ans-:
+import java.util.Stack;
+
+public class ValidParenthesisString {
+    public static boolean checkValidString(String s) {
+        Stack<Integer> leftStack = new Stack<>();
+        Stack<Integer> starStack = new Stack<>();
+        
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            
+            if (c == '(') {
+                leftStack.push(i);
+            } else if (c == '*') {
+                starStack.push(i);
+            } else {
+                if (!leftStack.isEmpty()) {
+                    leftStack.pop();
+                } else if (!starStack.isEmpty()) {
+                    starStack.pop();
+                } else {
+                    return false;
+                }
+            }
+        }
+        
+        while (!leftStack.isEmpty() && !starStack.isEmpty()) {
+            if (leftStack.pop() > starStack.pop()) {
+                return false;
+            }
+        }
+        
+        return leftStack.isEmpty();
+    }
+    
+    public static void main(String[] args) {
+        String s = "()";
+        System.out.println(checkValidString(s)); // Output: true
+    }
+}
+<aside>
+💡  **3**
+
+Given two strings word1 and word2, return *the minimum number of **steps** required to make* word1 *and* word2 *the same*.
+
+In one **step**, you can delete exactly one character in either string.
+
+**Example 1:**
+
+**Input:** word1 = "sea", word2 = "eat"
+
+**Output:** 2
+
+**Explanation:** You need one step to make "sea" to "ea" and another step to make "eat" to "ea".
+
+ans-:
+public class DeleteOperation {
+    public static int minDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        
+        int[][] dp = new int[m + 1][n + 1];
+        
+        for (int i = 0; i <= m; i++) {
+            for (int j = 0; j <= n; j++) {
+                if (i == 0 || j == 0) {
+                    dp[i][j] = i + j;
+                } else if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + 1;
+                }
+            }
+        }
+        
+        return dp[m][n];
+    }
+    
+    public static void main(String[] args) {
+        String word1 = "sea";
+        String word2 = "eat";
+        System.out.println(minDistance(word1, word2)); // Output: 2
+    }
+}
+<aside>
+💡 **4**
+
+You need to construct a binary tree from a string consisting of parenthesis and integers.
+
+The whole input represents a binary tree. It contains an integer followed by zero, one or two pairs of parenthesis. The integer represents the root's value and a pair of parenthesis contains a child binary tree with the same structure.
+You always start to construct the **left** child node of the parent first if it exists.
+
+**Input:** s = "4(2(3)(1))(6(5))"
+
+**Output:** [4,2,6,3,1,5]
+ans-:
+public class ConstructBinaryTreeFromString {
+    public static class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        
+        TreeNode(int val) {
+            this.val = val;
+        }
+    }
+    
+    public static TreeNode str2tree(String s) {
+        if (s.isEmpty()) {
+            return null;
+        }
+        
+        int firstParen = s.indexOf("(");
+        int val = (firstParen == -1) ? Integer.parseInt(s) : Integer.parseInt(s.substring(0, firstParen));
+        TreeNode root = new TreeNode(val);
+        
+        if (firstParen == -1) {
+            return root;
+        }
+        
+        int start = firstParen, count = 0;
+        
+        for (int i = start; i < s.length(); i++) {
+            if (s.charAt(i) == '(') {
+                count++;
+            } else if (s.charAt(i) == ')') {
+                count--;
+            }
+            
+            if (count == 0 && start == firstParen) {
+                root.left = str2tree(s.substring(start + 1, i));
+                start = i + 1;
+            } else if (count == 0) {
+                root.right = str2tree(s.substring(start + 1, i));
+            }
+        }
+        
+        return root;
+    }
+    
+    public static void inorderTraversal(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        
+        inorderTraversal(root.left);
+        System.out.print(root.val + " ");
+        inorderTraversal(root.right);
+    }
+    
+    public static void main(String[] args) {
+        String s = "4(2(3)(1))(6(5))";
+        TreeNode root = str2tree(s);
+        inorderTraversal(root); // Output: 3 2 1 4 5 6
+    }
+}
+<aside>
+💡 **5**
+
+Given an array of characters chars, compress it using the following algorithm:
+
+Begin with an empty string s. For each group of **consecutive repeating characters** in chars:
+
+- If the group's length is 1, append the character to s.
+- Otherwise, append the character followed by the group's length.
+
+The compressed string s **should not be returned separately**, but instead, be stored **in the input character array chars**. Note that group lengths that are 10 or longer will be split into multiple characters in chars.
+
+After you are done **modifying the input array,** return *the new length of the array*.
+
+You must write an algorithm that uses only constant extra space.
+
+**Example 1:**
+
+**Input:** chars = ["a","a","b","b","c","c","c"]
+
+**Output:** Return 6, and the first 6 characters of the input array should be: ["a","2","b","2","c","3"]
+
+**Explanation:**
+
+The groups are "aa", "bb", and "ccc". This compresses to "a2b2c3".
+
+ans-:
+public class StringCompression {
+    public static int compress(char[] chars) {
+        int index = 0; // index to update compressed characters in-place
+        int count = 1; // count of consecutive repeating characters
+        
+        for (int i = 1; i <= chars.length; i++) {
+            if (i < chars.length && chars[i] == chars[i - 1]) {
+                count++;
+            } else {
+                chars[index++] = chars[i - 1]; // update compressed character
+                
+                if (count > 1) {
+                    // convert count to characters and update compressed characters
+                    String countStr = String.valueOf(count);
+                    for (char c : countStr.toCharArray()) {
+                        chars[index++] = c;
+                    }
+                }
+                
+                count = 1; // reset count for next group
+            }
+        }
+        
+        return index; // return the new length of the compressed array
+    }
+    
+    public static void main(String[] args) {
+        char[] chars = {'a', 'a', 'b', 'b', 'c', 'c', 'c'};
+        int newLength = compress(chars);
+        System.out.println(newLength); // Output: 6
+        for (int i = 0; i < newLength; i++) {
+            System.out.print(chars[i] + " "); // Output: a 2 b 2 c 3
+        }
+    }
+}
+<aside>
+💡 **6**
+
+Given two strings s and p, return *an array of all the start indices of* p*'s anagrams in* s. You may return the answer in **any order**.
+
+An **Anagram** is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+**Example 1:**
+
+**Input:** s = "cbaebabacd", p = "abc"
+
+**Output:** [0,6]
+
+**Explanation:**
+
+The substring with start index = 0 is "cba", which is an anagram of "abc".
+
+The substring with start index = 6 is "bac", which is an anagram of "abc".
+
+ans-:
+import java.util.*;
+
+public class AnagramsInString {
+    public static List<Integer> findAnagrams(String s, String p) {
+        List<Integer> result = new ArrayList<>();
+        
+        // Initialize frequency maps
+        Map<Character, Integer> targetFreq = new HashMap<>();
+        Map<Character, Integer> windowFreq = new HashMap<>();
+        for (char c : p.toCharArray()) {
+            targetFreq.put(c, targetFreq.getOrDefault(c, 0) + 1);
+        }
+        
+        int left = 0; // left pointer of the window
+        int right = 0; // right pointer of the window
+        
+        while (right < s.length()) {
+            char currentChar = s.charAt(right);
+            
+            // Expand the window by adding the rightmost character
+            windowFreq.put(currentChar, windowFreq.getOrDefault(currentChar, 0) + 1);
+            
+            // Shrink the window if it's larger than p's length
+            if (right - left + 1 > p.length()) {
+                char leftChar = s.charAt(left);
+                windowFreq.put(leftChar, windowFreq.get(leftChar) - 1);
+                if (windowFreq.get(leftChar) == 0) {
+                    windowFreq.remove(leftChar);
+                }
+                left++;
+            }
+            
+            // Check if the current window is an anagram
+            if (right - left + 1 == p.length() && windowFreq.equals(targetFreq)) {
+                result.add(left);
+            }
+            
+            right++; // Move the right pointer to expand the window
+        }
+        
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        String s = "cbaebabacd";
+        String p = "abc";
+        List<Integer> indices = findAnagrams(s, p);
+        System.out.println(indices); // Output: [0, 6]
+    }
+}
+<aside>
+💡 **7**
+
+Given an encoded string, return its decoded string.
+
+The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times. Note that k is guaranteed to be a positive integer.
+
+You may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc. Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k. For example, there will not be input like 3a or 2[4].
+
+The test cases are generated so that the length of the output will never exceed 105.
+
+**Example 1:**
+
+**Input:** s = "3[a]2[bc]"
+
+**Output:** "aaabcbc"
+
+ans-:
+import java.util.*;
+
+public class DecodeString {
+    public static String decodeString(String s) {
+        Stack<Integer> countStack = new Stack<>();
+        Stack<StringBuilder> stringStack = new Stack<>();
+        StringBuilder currentString = new StringBuilder();
+        int count = 0;
+        
+        for (char ch : s.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                count = count * 10 + (ch - '0');
+            } else if (ch == '[') {
+                countStack.push(count);
+                stringStack.push(currentString);
+                currentString = new StringBuilder();
+                count = 0;
+            } else if (ch == ']') {
+                StringBuilder decodedString = stringStack.pop();
+                int repeatCount = countStack.pop();
+                for (int i = 0; i < repeatCount; i++) {
+                    decodedString.append(currentString);
+                }
+                currentString = decodedString;
+            } else {
+                currentString.append(ch);
+            }
+        }
+        
+        return currentString.toString();
+    }
+    
+    public static void main(String[] args) {
+        String s = "3[a]2[bc]";
+        String decodedString = decodeString(s);
+        System.out.println(decodedString); // Output: "aaabcbc"
+    }
+}
+<aside>
+💡  **8**
+
+Given two strings s and goal, return true *if you can swap two letters in* s *so the result is equal to* goal*, otherwise, return* false*.*
+
+Swapping letters is defined as taking two indices i and j (0-indexed) such that i != j and swapping the characters at s[i] and s[j].
+
+- For example, swapping at indices 0 and 2 in "abcd" results in "cbad".
+
+**Example 1:**
+
+**Input:** s = "ab", goal = "ba"
+
+**Output:** true
+
+**Explanation:** You can swap s[0] = 'a' and s[1] = 'b' to get "ba", which is equal to goal.
+
+ans-:
+public class StringSwap {
+    public static boolean canSwap(String s, String goal) {
+        int n = s.length();
+        int diffCount = 0;
+        int[] indices = new int[2];
+        
+        for (int i = 0; i < n; i++) {
+            if (s.charAt(i) != goal.charAt(i)) {
+                indices[diffCount] = i;
+                diffCount++;
+            }
+            
+            if (diffCount > 2) {
+                return false;
+            }
+        }
+        
+        if (diffCount != 2) {
+            return false;
+        }
+        
+        int i = indices[0];
+        int j = indices[1];
+        
+        return s.charAt(i) == goal.charAt(j) && s.charAt(j) == goal.charAt(i);
+    }
+    
+    public static void main(String[] args) {
+        String s = "ab";
+        String goal = "ba";
+        boolean canSwap = canSwap(s, goal);
+        System.out.println(canSwap); // Output: true
+    }
+}
